@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 
 namespace StructuralAnalyzer
 {
@@ -21,27 +22,19 @@ namespace StructuralAnalyzer
                 }
 
                 var callMatrix = visitor.GetCallMatrix();
-                DisplayCallMatrix(callMatrix);
+                Console.WriteLine("Graph:\nNumber of vertex: " + callMatrix.Count);
+                //DisplayCallMatrix(callMatrix);
 
                 var louvain = new LouvainAlgorithm(callMatrix);
                 var louvainCommunities = louvain.Execute();
-                DisplayCommunities("Louvain Communities", louvainCommunities);
+                DisplayCommunities("Louvain Communities", louvainCommunities, callMatrix);
 
-                var leiden = new LeidenAlgorithm(callMatrix);
-                var leidenCommunities = leiden.Execute();
-                DisplayCommunities("Leiden Communities", leidenCommunities);
+                // Run the louvain again on the results of the first run
+                var louvain2 = new LouvainAlgorithm(callMatrix, louvainCommunities);
+                var louvainCommunities2 = louvain2.Execute();
+                DisplayCommunities("Louvain Communities 2", louvainCommunities2, callMatrix);
 
-                SuggestMicroservices(louvainCommunities, "Louvain");
-                SuggestMicroservices(leidenCommunities, "Leiden");
 
-                var outputPath = "output/microservices";
-                Directory.CreateDirectory(outputPath);
-
-                var microserviceGenerator = new MicroserviceGenerator(outputPath);
-                microserviceGenerator.GenerateMicroservices(louvainCommunities, callMatrix);
-                microserviceGenerator.GenerateMicroservices(leidenCommunities, callMatrix);
-
-                DisplayMicroserviceInterfaces(outputPath);
             }
             catch (Exception ex)
             {
@@ -52,7 +45,9 @@ namespace StructuralAnalyzer
         static void DisplayCallMatrix(Dictionary<string, Dictionary<string, Dictionary<string, int>>> callMatrix)
         {
             Console.WriteLine("\n||>>>>>>>>>>>>>>>>>>>>>>\n");
-            Console.WriteLine($"Call Matrix:\n");
+            Console.WriteLine($"Graph:\n");
+            //number of vertex
+            Console.WriteLine($"Number of Vertex: {callMatrix.Count}");
             foreach (var classEntry in callMatrix)
             {
                 Console.WriteLine($"Class: {classEntry.Key}");
@@ -68,51 +63,45 @@ namespace StructuralAnalyzer
             Console.WriteLine("\n<<<<<<<<<<<<<<<<<<<<<<||\n\n");
         }
 
-        static void DisplayCommunities(string title, Dictionary<string, string> communities)
+        static void DisplayCommunities(string title, Dictionary<string, string> communities, Dictionary<string, Dictionary<string, Dictionary<string, int>>> callMatrix)
         {
             Console.WriteLine($"\n||>>>>>>>>>>>>>>>>>>>>>>\n");
             Console.WriteLine($"{title}:\n");
-            foreach (var community in communities)
-            {
-                Console.WriteLine($"Vertex: {community.Key} - Community: {community.Value}");
-            }
-            Console.WriteLine("\n<<<<<<<<<<<<<<<<<<<<<<||\n\n");
-        }
-
-        static void SuggestMicroservices(Dictionary<string, string> communities, string algorithm)
-        {
-            Console.WriteLine($"\n||>>>>>>>>>>>>>>>>>>>>>>\n");
-            Console.WriteLine($"Sugestões de Microserviços ({algorithm}):\n");
 
             var groupedCommunities = communities.GroupBy(c => c.Value).ToDictionary(g => g.Key, g => g.Select(c => c.Key).ToList());
-
+            Console.WriteLine($"Number of Communities: {groupedCommunities.Count}\n");
+            int ignored = 0;
             foreach (var community in groupedCommunities)
             {
-                Console.WriteLine($"Microserviço: {community.Key}");
-                foreach (var vertex in community.Value)
+                
+                var classesInCommunity = new HashSet<string>();
+
+                foreach (var method in community.Value)
                 {
-                    Console.WriteLine($"  Método: {vertex}");
+                    foreach (var classEntry in callMatrix)
+                    {
+                        if (classEntry.Value.ContainsKey(method))
+                        {
+                            classesInCommunity.Add(classEntry.Key);
+                        }
+                    }
+                }
+                if (classesInCommunity.Count == 1)
+                {
+                    ignored++;
+                    continue;
+                }
+                Console.WriteLine($"Community: {community.Key}");
+                foreach (var className in classesInCommunity)
+                {
+                    Console.WriteLine($"  Class: {className}");
                 }
             }
+
+            Console.WriteLine($"\nWith more than one class: {groupedCommunities.Count - ignored} \nIgnored: {ignored}");
 
             Console.WriteLine("\n<<<<<<<<<<<<<<<<<<<<<<||\n\n");
         }
 
-        static void DisplayMicroserviceInterfaces(string outputPath)
-        {
-            var directories = Directory.GetDirectories(outputPath);
-            foreach (var directory in directories)
-            {
-                var interfaceFiles = Directory.GetFiles(directory, "I*.cs");
-                foreach (var interfaceFile in interfaceFiles)
-                {
-                    Console.WriteLine($"\n||>>>>>>>>>>>>>>>>>>>>>>\n");
-                    Console.WriteLine($"Interface: {Path.GetFileName(interfaceFile)}\n");
-                    var code = File.ReadAllText(interfaceFile);
-                    Console.WriteLine(code);
-                    Console.WriteLine("\n<<<<<<<<<<<<<<<<<<<<<<||\n\n");
-                }
-            }
-        }
     }
 }

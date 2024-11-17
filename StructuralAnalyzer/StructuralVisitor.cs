@@ -24,7 +24,7 @@ namespace StructuralAnalyzer
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
             _currentClass = node.Identifier.Text;
-            if (!_callMatrix.ContainsKey(_currentClass))
+            if (_currentClass != null && !_callMatrix.ContainsKey(_currentClass))
             {
                 _callMatrix[_currentClass] = new Dictionary<string, Dictionary<string, int>>();
             }
@@ -34,7 +34,7 @@ namespace StructuralAnalyzer
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
         {
             _currentMethod = node.Identifier.Text;
-            if (!_callMatrix[_currentClass].ContainsKey(_currentMethod))
+            if (_currentClass != null && _currentMethod != null && _callMatrix.ContainsKey(_currentClass) && !_callMatrix[_currentClass].ContainsKey(_currentMethod))
             {
                 _callMatrix[_currentClass][_currentMethod] = new Dictionary<string, int>();
             }
@@ -46,7 +46,7 @@ namespace StructuralAnalyzer
             var methodName = node.Expression.ToString();
             if (_currentClass != null && _currentMethod != null)
             {
-                if (!_callMatrix[_currentClass][_currentMethod].ContainsKey(methodName))
+                if (_currentClass != null && _currentMethod != null && _callMatrix.ContainsKey(_currentClass) && _callMatrix[_currentClass].ContainsKey(_currentMethod) && !_callMatrix[_currentClass][_currentMethod].ContainsKey(methodName))
                 {
                     _callMatrix[_currentClass][_currentMethod][methodName] = 1;
                 }

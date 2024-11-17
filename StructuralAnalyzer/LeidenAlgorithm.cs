@@ -13,6 +13,13 @@ namespace StructuralAnalyzer
             _callMatrix = callMatrix;
         }
 
+        public LeidenAlgorithm(Dictionary<string, Dictionary<string, Dictionary<string, int>>> callMatrix, Dictionary<string, string> communities)
+        {
+            // Remove vertices that are not in the communities
+            _callMatrix = callMatrix.ToDictionary(c => c.Key, c => c.Value.Where(m => communities.ContainsKey(m.Key)).ToDictionary(m => m.Key, m => m.Value));
+
+        }
+
         public Dictionary<string, string> Execute()
         {
             var graph = BuildGraph();

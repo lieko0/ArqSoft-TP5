@@ -3,7 +3,7 @@
     "StructuralAnalyzer": {
       "commandName": "Project",
       "commandLineArgs": "MonolithicExample",
-      "workingDirectory": "S:\\stuffs\\zQuick\\padrao-arquitetural\\",
+      "workingDirectory": "S:\\stuffs\\zQuick\\padrao-arquitetural\\ArqSoft-TP5",
       "remoteDebugEnabled": true
     }
   }

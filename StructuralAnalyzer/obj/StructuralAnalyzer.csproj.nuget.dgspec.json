@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "S:\\stuffs\\zQuick\\padrao-arquitetural\\StructuralAnalyzer\\StructuralAnalyzer.csproj": {}
+    "S:\\stuffs\\zQuick\\padrao-arquitetural\\ArqSoft-TP5\\StructuralAnalyzer\\StructuralAnalyzer.csproj": {}
   },
   "projects": {
-    "S:\\stuffs\\zQuick\\padrao-arquitetural\\StructuralAnalyzer\\StructuralAnalyzer.csproj": {
+    "S:\\stuffs\\zQuick\\padrao-arquitetural\\ArqSoft-TP5\\StructuralAnalyzer\\StructuralAnalyzer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "S:\\stuffs\\zQuick\\padrao-arquitetural\\StructuralAnalyzer\\StructuralAnalyzer.csproj",
+        "projectUniqueName": "S:\\stuffs\\zQuick\\padrao-arquitetural\\ArqSoft-TP5\\StructuralAnalyzer\\StructuralAnalyzer.csproj",
         "projectName": "StructuralAnalyzer",
-        "projectPath": "S:\\stuffs\\zQuick\\padrao-arquitetural\\StructuralAnalyzer\\StructuralAnalyzer.csproj",
+        "projectPath": "S:\\stuffs\\zQuick\\padrao-arquitetural\\ArqSoft-TP5\\StructuralAnalyzer\\StructuralAnalyzer.csproj",
         "packagesPath": "C:\\Users\\marco\\.nuget\\packages\\",
-        "outputPath": "S:\\stuffs\\zQuick\\padrao-arquitetural\\StructuralAnalyzer\\obj\\",
+        "outputPath": "S:\\stuffs\\zQuick\\padrao-arquitetural\\ArqSoft-TP5\\StructuralAnalyzer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\marco\\AppData\\Roaming\\NuGet\\NuGet.Config",
