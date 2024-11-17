@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "StructuralAnalyzer": {
+      "commandName": "Project",
+      "commandLineArgs": "MonolithicExample",
+      "workingDirectory": "S:\\stuffs\\zQuick\\padrao-arquitetural\\",
+      "remoteDebugEnabled": true
+    }
+  }
+}
