@@ -12,43 +12,17 @@ namespace StructuralAnalyzer
         {
             _callMatrix = callMatrix;
         }
-
-        public LouvainAlgorithm(Dictionary<string, Dictionary<string, Dictionary<string, int>>> callMatrix, Dictionary<string, string> communities)
-        {
-            // Correct the callMatrix/graph so that represents the graph of the communities agregation
-            _callMatrix = new Dictionary<string, Dictionary<string, Dictionary<string, int>>>();
-            foreach (var classEntry in callMatrix)
-            {
-                foreach (var methodEntry in classEntry.Value)
-                {
-                    foreach (var referenceEntry in methodEntry.Value)
-                    {
-                        if (communities.ContainsKey(methodEntry.Key) && communities.ContainsKey(referenceEntry.Key))
-                        {
-                            if (!_callMatrix.ContainsKey(communities[methodEntry.Key]))
-                            {
-                                _callMatrix[communities[methodEntry.Key]] = new Dictionary<string, Dictionary<string, int>>();
-                            }
-                            if (!_callMatrix[communities[methodEntry.Key]].ContainsKey(communities[referenceEntry.Key]))
-                            {
-                                _callMatrix[communities[methodEntry.Key]][communities[referenceEntry.Key]] = new Dictionary<string, int>();
-                            }
-                            if (!_callMatrix[communities[methodEntry.Key]][communities[referenceEntry.Key]].ContainsKey(methodEntry.Key))
-                            {
-                                _callMatrix[communities[methodEntry.Key]][communities[referenceEntry.Key]][methodEntry.Key] = 0;
-                            }
-                            _callMatrix[communities[methodEntry.Key]][communities[referenceEntry.Key]][methodEntry.Key] += referenceEntry.Value;
-                        }
-                    }
-                }
-            }
-
-        }
-
         public Dictionary<string, string> Execute()
         {
             var graph = BuildGraph();
             var communities = InitializeCommunities(graph);
+
+            // print communities
+            foreach (var community in communities)
+            {
+                Console.WriteLine($"Community: {community.Key} - {community.Value}");
+            }
+
             bool modularityImproved;
 
             do
@@ -100,16 +74,29 @@ namespace StructuralAnalyzer
 
             foreach (var classEntry in _callMatrix)
             {
-                foreach (var methodEntry in classEntry.Value)
+
+                if (!graph.ContainsKey(classEntry.Key))
                 {
-                    foreach (var referenceEntry in methodEntry.Value)
+                    graph[classEntry.Key] = new List<string>();
+                }
+                foreach (var classReceiver in classEntry.Value)
+                {
+                    if (!graph[classEntry.Key].Contains(classReceiver.Key) )
                     {
-                        if (!graph.ContainsKey(methodEntry.Key))
-                        {
-                            graph[methodEntry.Key] = new List<string>();
-                        }
-                        graph[methodEntry.Key].Add(referenceEntry.Key);
+                        if(graph.ContainsKey(classReceiver.Key) && graph[classReceiver.Key].Contains(classEntry.Key))
+                            continue;
+
+                        graph[classEntry.Key].Add(classReceiver.Key);
                     }
+                }
+            }
+            // print graph
+            foreach (var vertex in graph)
+            {
+                Console.WriteLine($"Vertex: {vertex.Key}");
+                foreach (var neighbor in vertex.Value)
+                {
+                    Console.WriteLine($"  Neighbor: {neighbor}");
                 }
             }
 

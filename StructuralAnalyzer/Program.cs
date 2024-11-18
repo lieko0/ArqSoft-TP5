@@ -18,23 +18,25 @@ namespace StructuralAnalyzer
                 foreach (var file in files)
                 {
                     var tree = parser.Parse(file);
-                    visitor.Visit(tree.GetRoot());
+                    visitor.Visits(tree, tree.GetRoot());
                 }
 
                 var callMatrix = visitor.GetCallMatrix();
                 Console.WriteLine("Graph:\nNumber of vertex: " + callMatrix.Count);
-                //DisplayCallMatrix(callMatrix);
-
+                // DisplayCallMatrix(callMatrix);
+                
                 var louvain = new LouvainAlgorithm(callMatrix);
                 var louvainCommunities = louvain.Execute();
-                DisplayCommunities("Louvain Communities", louvainCommunities, callMatrix);
-
+                DisplayCommunities("Louvain Communities", louvainCommunities, callMatrix); 
+                
+                /*
                 // Run the louvain again on the results of the first run
                 var louvain2 = new LouvainAlgorithm(callMatrix, louvainCommunities);
                 var louvainCommunities2 = louvain2.Execute();
                 DisplayCommunities("Louvain Communities 2", louvainCommunities2, callMatrix);
 
-
+                DisplayCommunitiesByAggregation("Louvain Communities Aggregated 2", louvainCommunities2, callMatrix);
+                */
             }
             catch (Exception ex)
             {
@@ -51,10 +53,10 @@ namespace StructuralAnalyzer
             foreach (var classEntry in callMatrix)
             {
                 Console.WriteLine($"Class: {classEntry.Key}");
-                foreach (var methodEntry in classEntry.Value)
+                foreach (var classReceiver in classEntry.Value)
                 {
-                    Console.WriteLine($"  Method: {methodEntry.Key}");
-                    foreach (var referenceEntry in methodEntry.Value)
+                    Console.WriteLine($"  Receiver: {classReceiver.Key}");
+                    foreach (var referenceEntry in classReceiver.Value)
                     {
                         Console.WriteLine($"    Calls: {referenceEntry.Key} - Count: {referenceEntry.Value}");
                     }
@@ -67,41 +69,27 @@ namespace StructuralAnalyzer
         {
             Console.WriteLine($"\n||>>>>>>>>>>>>>>>>>>>>>>\n");
             Console.WriteLine($"{title}:\n");
-
-            var groupedCommunities = communities.GroupBy(c => c.Value).ToDictionary(g => g.Key, g => g.Select(c => c.Key).ToList());
-            Console.WriteLine($"Number of Communities: {groupedCommunities.Count}\n");
-            int ignored = 0;
-            foreach (var community in groupedCommunities)
+            var communityGroups = communities.GroupBy(c => c.Value);
+            foreach (var community in communityGroups)
             {
-                
-                var classesInCommunity = new HashSet<string>();
-
-                foreach (var method in community.Value)
+                if(community.Count() > 1)
                 {
-                    foreach (var classEntry in callMatrix)
+                    Console.WriteLine($"Community: {community.Key}");
+                    foreach (var vertex in community)
                     {
-                        if (classEntry.Value.ContainsKey(method))
-                        {
-                            classesInCommunity.Add(classEntry.Key);
-                        }
+                        Console.WriteLine($"  {vertex.Key}");
                     }
-                }
-                if (classesInCommunity.Count == 1)
-                {
-                    ignored++;
-                    continue;
-                }
-                Console.WriteLine($"Community: {community.Key}");
-                foreach (var className in classesInCommunity)
-                {
-                    Console.WriteLine($"  Class: {className}");
+
                 }
             }
-
-            Console.WriteLine($"\nWith more than one class: {groupedCommunities.Count - ignored} \nIgnored: {ignored}");
-
             Console.WriteLine("\n<<<<<<<<<<<<<<<<<<<<<<||\n\n");
+
         }
+
 
     }
 }
+
+
+
+

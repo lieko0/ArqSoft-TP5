@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StructuralAnalyzer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+acd47e78a94e8f76482075a231f24849a1f71a22")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+123656662d896366149a027da4fcae6976c0c04f")]
 [assembly: System.Reflection.AssemblyProductAttribute("StructuralAnalyzer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StructuralAnalyzer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
